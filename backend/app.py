@@ -40,10 +40,11 @@ async def analyze_video(request: AnalyzeRequest):
         raise HTTPException(status_code=400, detail="Invalid YouTube URL")
     
     try:
-        # 1. Extract Transcript
-        transcript_list = YouTubeTranscriptApi.get_transcript(video_id)
+        # 1. Extract Transcript (v1.x API: instance method)
+        ytt = YouTubeTranscriptApi()
+        transcript_list = ytt.fetch(video_id)
         # Combine text
-        full_transcript = " ".join([item['text'] for item in transcript_list])
+        full_transcript = " ".join([item.text for item in transcript_list])
         
         # TODO: Replace the mock below with an actual LLM API call
         # e.g., response = openai.ChatCompletion.create(...)
