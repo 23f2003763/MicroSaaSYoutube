@@ -1,4 +1,4 @@
-# AlgoMirror Deployment Guide
+# BoostMyYT Deployment Guide
 
 ## 1. Deploy the Backend (Render)
 1. Go to [Render](https://render.com) and sign in.
@@ -10,7 +10,7 @@
    - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `uvicorn app:app --host 0.0.0.0 --port $PORT`
 5. Click **Create Web Service**. 
-6. Once deployed, copy the Render backend URL (e.g., `https://algomirror-backend.onrender.com`).
+6. Once deployed, copy the Render backend URL (e.g., `https://boostmyyt-backend.onrender.com`).
 
 ## 2. Connect Backend to Frontend
 1. Open `frontend/index.html`.

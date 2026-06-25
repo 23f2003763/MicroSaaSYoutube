@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from youtube_transcript_api import YouTubeTranscriptApi
 import re
 
-app = FastAPI(title="AlgoMirror API")
+app = FastAPI(title="BoostMyYT API")
 
 # Setup CORS
 app.add_middleware(
