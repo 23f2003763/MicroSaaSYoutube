@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlgoMirror | Reverse-engineer viral scripts</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.5);
+            --accent: #8b5cf6;
+            --accent-glow: rgba(139, 92, 246, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3rem 1.5rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            background: linear-gradient(to right, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        p.subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .input-group {
+                flex-direction: row;
+            }
+        }
+
+        input[type="url"] {
+            flex-grow: 1;
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input[type="url"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        button {
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            border: none;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results {
+            display: none;
+            flex-direction: column;
+            gap: 2rem;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .free-tier h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1rem;
+            border-radius: 1rem;
+            border: 1px solid var(--glass-border);
+            text-align: center;
+        }
+
+        .stat-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #60a5fa;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-card .label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .points-list {
+            list-style: none;
+        }
+
+        .points-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        .points-list li::before {
+            content: "•";
+            color: var(--primary);
+            font-size: 1.5rem;
+            position: absolute;
+            left: 0;
+            top: -0.2rem;
+        }
+
+        .premium-tier {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .premium-tier h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #c084fc;
+        }
+
+        .blurred-content {
+            filter: blur(8px);
+            opacity: 0.5;
+            user-select: none;
+            pointer-events: none;
+        }
+        
+        .mock-script {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1rem;
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+            font-family: monospace;
+            color: #a78bfa;
+        }
+
+        .paywall-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to bottom, rgba(15, 23, 42, 0.2), rgba(15, 23, 42, 0.9) 60%);
+            border-radius: 1.5rem;
+            z-index: 10;
+        }
+
+        .unlock-btn {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.6);
+            font-size: 1.25rem;
+            padding: 1.25rem 2.5rem;
+            border-radius: 999px;
+            text-decoration: none;
+            display: inline-block;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .unlock-btn:hover {
+            box-shadow: 0 0 50px rgba(245, 158, 11, 0.8);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--glass-border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            display: none;
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            margin-top: 1rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AlgoMirror</h1>
+            <p class="subtitle">Reverse-engineer viral scripts in seconds.</p>
+        </header>
+
+        <main>
+            <div class="glass-panel">
+                <form id="analyze-form" class="input-group">
+                    <input type="url" id="youtube-url" placeholder="Paste YouTube URL here (e.g. https://youtube.com/watch?v=...)" required>
+                    <button type="submit" id="submit-btn">Analyze Pipeline</button>
+                </form>
+                <div id="error-box" class="error-message"></div>
+            </div>
+
+            <div id="loader" class="loader">
+                <div class="spinner"></div>
+                <p style="margin-top: 1rem; color: var(--text-muted);">Extracting transcript & analyzing...</p>
+            </div>
+
+            <div id="results" class="results">
+                <!-- Free Tier -->
+                <div class="glass-panel free-tier">
+                    <h2>📊 Free Analysis</h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="value" id="stat-hook">-</div>
+                            <div class="label">Hook Length</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="value" id="stat-words">-</div>
+                            <div class="label">Word Count</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="value" id="stat-time">-</div>
+                            <div class="label">Est. Read Time</div>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: #e2e8f0;">Key Structural Points</h3>
+                    <ul class="points-list" id="main-points-list">
+                        <!-- Populated by JS -->
+                    </ul>
+                </div>
+
+                <!-- Premium Tier -->
+                <div class="glass-panel premium-tier">
+                    <div class="blurred-content">
+                        <h2>💎 Premium Viral Template</h2>
+                        <p style="margin-bottom: 1rem; color: var(--text-muted);">Fill-in-the-blank script structure based on this video's success.</p>
+                        
+                        <div class="mock-script">
+                            [0:00 - 0:15] HOOK:<br>
+                            Open with a bold claim about [Topic] and agitate the viewer's pain point regarding [Pain Point].
+                        </div>
+                        <div class="mock-script">
+                            [0:15 - 0:45] INTRO:<br>
+                            Introduce the solution: [Core Concept] and show a quick montage of proof.
+                        </div>
+                        <div class="mock-script">
+                            [0:45 - 2:00] BODY 1:<br>
+                            Step 1: Explain the biggest misconception about [Topic].
+                        </div>
+                    </div>
+
+                    <div class="paywall-overlay">
+                        <!-- PLACEHOLDER FOR RAZORPAY PAYMENT LINK -->
+                        <a href="YOUR_RAZORPAY_PAYMENT_LINK_HERE" class="unlock-btn" target="_blank" rel="noopener noreferrer">
+                            Unlock Viral Script Template - ₹399
+                        </a>
+                        <p style="margin-top: 1rem; font-size: 0.875rem; color: #cbd5e1;">One-time payment for full structural breakdown</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const form = document.getElementById('analyze-form');
+        const urlInput = document.getElementById('youtube-url');
+        const submitBtn = document.getElementById('submit-btn');
+        const loader = document.getElementById('loader');
+        const results = document.getElementById('results');
+        const errorBox = document.getElementById('error-box');
+
+        // Backend API URL. During local dev, it is typically http://127.0.0.1:8000
+        // Change this for production deployment (e.g. your Render backend URL)
+        const API_URL = 'http://127.0.0.1:8000'; // PLACEHOLDER_BACKEND_URL
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const url = urlInput.value.trim();
+            if(!url) return;
+
+            // Reset UI
+            errorBox.style.display = 'none';
+            results.style.display = 'none';
+            loader.style.display = 'block';
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Analyzing...';
+
+            try {
+                const response = await fetch(`${API_URL}/analyze`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ url: url })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Failed to analyze video');
+                }
+
+                // Populate Free Tier Data
+                document.getElementById('stat-hook').innerText = data.free_analysis.hook_length;
+                document.getElementById('stat-words').innerText = data.free_analysis.word_count.toLocaleString();
+                document.getElementById('stat-time').innerText = data.free_analysis.estimated_read_time;
+
+                const pointsList = document.getElementById('main-points-list');
+                pointsList.innerHTML = '';
+                data.free_analysis.main_points.forEach(point => {
+                    const li = document.createElement('li');
+                    li.innerText = point;
+                    pointsList.appendChild(li);
+                });
+
+                // Show results
+                loader.style.display = 'none';
+                results.style.display = 'flex';
+                
+            } catch (err) {
+                loader.style.display = 'none';
+                errorBox.innerText = err.message;
+                errorBox.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Analyze Pipeline';
+            }
+        });
+    </script>
+</body>
+</html>
