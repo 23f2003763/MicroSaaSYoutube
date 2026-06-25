@@ -4,32 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BoostMyYT | Reverse-engineer viral scripts</title>
+    <meta name="description" content="BoostMyYT reverse-engineers viral YouTube scripts so you can replicate what works. Paste a link, get a proven template.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #000000;
-            --glass-bg: #000000;
-            --glass-border: #ffffff;
-            --text-main: #ffffff;
-            --text-muted: #888888;
-            --primary: #ffffff;
-            --primary-glow: rgba(255, 255, 255, 0.3);
+            --bg: #000000;
+            --surface: #0a0a0a;
+            --border: rgba(255, 255, 255, 0.15);
+            --border-hover: rgba(255, 255, 255, 0.4);
+            --text: #ffffff;
+            --text-muted: #777777;
+            --white: #ffffff;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 3rem 1.5rem;
+        }
+
+        .page-wrapper {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3rem 1.5rem 2rem;
         }
 
         .container {
@@ -40,392 +52,431 @@
             gap: 2rem;
         }
 
+        /* ── Header ── */
         header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
         }
 
         h1 {
             font-size: 3.5rem;
             font-weight: 800;
-            letter-spacing: -0.05em;
-            color: #ffffff;
+            letter-spacing: -0.04em;
+            color: var(--white);
             margin-bottom: 0.5rem;
         }
 
         p.subtitle {
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             color: var(--text-muted);
         }
 
-        .glass-panel {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 1.5rem;
+        /* ── Panels ── */
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
             padding: 2rem;
         }
 
+        /* ── Input ── */
         .input-group {
             display: flex;
             flex-direction: column;
             gap: 1rem;
         }
-
         @media (min-width: 640px) {
-            .input-group {
-                flex-direction: row;
-            }
+            .input-group { flex-direction: row; }
         }
 
         input[type="url"] {
             flex-grow: 1;
-            padding: 1rem 1.5rem;
-            border-radius: 1rem;
-            background: #000000;
-            border: 1px solid var(--glass-border);
-            color: var(--text-main);
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
+            padding: 1rem 1.25rem;
+            border-radius: 0.75rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 1rem;
+            font-family: inherit;
             outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
-
+        input[type="url"]::placeholder { color: #555; }
         input[type="url"]:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 15px var(--primary-glow);
+            border-color: var(--border-hover);
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.06);
         }
 
-        button {
+        .btn-primary {
             padding: 1rem 2rem;
-            border-radius: 1rem;
-            border: 1px solid var(--glass-border);
-            background: #ffffff;
-            color: #000000;
-            font-size: 1.1rem;
+            border-radius: 0.75rem;
+            border: none;
+            background: var(--white);
+            color: #000;
+            font-size: 1rem;
             font-weight: 700;
+            font-family: inherit;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.2s, box-shadow 0.2s;
+            white-space: nowrap;
         }
-
-        button:hover {
+        .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 0 15px var(--primary-glow);
+            box-shadow: 0 4px 20px rgba(255,255,255,0.15);
         }
-
-        button:disabled {
-            opacity: 0.7;
+        .btn-primary:disabled {
+            opacity: 0.5;
             cursor: not-allowed;
             transform: none;
-            background: #444444;
-            color: #aaaaaa;
-            border-color: #444444;
+            box-shadow: none;
         }
 
+        /* ── Progress Bar ── */
+        .progress-section {
+            display: none;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+        .progress-section.active { display: flex; }
+
+        .progress-bar-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--white);
+            border-radius: 999px;
+            transition: width 0.4s ease;
+        }
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* ── Error ── */
+        .error-message {
+            display: none;
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        /* ── Results ── */
         .results {
             display: none;
             flex-direction: column;
             gap: 2rem;
             animation: fadeIn 0.5s ease;
         }
-
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .free-tier h2 {
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #ffffff;
+        .section-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            color: var(--white);
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
-
         .stat-card {
-            background: #000000;
-            padding: 1rem;
+            background: var(--bg);
+            padding: 1.25rem 1rem;
             border-radius: 1rem;
-            border: 1px dashed var(--glass-border);
+            border: 1px solid var(--border);
             text-align: center;
         }
-
         .stat-card .value {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 0.25rem;
+            color: var(--white);
+            margin-bottom: 0.2rem;
         }
-
         .stat-card .label {
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        .points-list {
-            list-style: none;
+        .sub-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: #ccc;
         }
 
+        .points-list { list-style: none; }
         .points-list li {
             position: relative;
-            padding-left: 1.5rem;
-            margin-bottom: 0.75rem;
-            color: var(--text-main);
-            line-height: 1.5;
+            padding-left: 1.25rem;
+            margin-bottom: 0.65rem;
+            color: #ddd;
+            line-height: 1.6;
+            font-size: 0.95rem;
         }
-
         .points-list li::before {
-            content: "•";
-            color: #ffffff;
-            font-size: 1.5rem;
+            content: "—";
             position: absolute;
             left: 0;
-            top: -0.2rem;
+            color: #555;
         }
 
-        .premium-tier {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .premium-tier h2 {
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            color: #ffffff;
-        }
+        /* ── Premium ── */
+        .premium-tier { position: relative; overflow: hidden; }
 
         .blurred-content {
-            filter: blur(8px);
-            opacity: 0.4;
+            filter: blur(7px);
+            opacity: 0.35;
             user-select: none;
             pointer-events: none;
         }
-        
         .mock-script {
-            background: #000000;
-            padding: 1rem;
-            border-radius: 1rem;
-            margin-bottom: 1rem;
-            font-family: monospace;
-            color: #888888;
-            border: 1px dotted #ffffff;
+            background: var(--bg);
+            padding: 1rem 1.25rem;
+            border-radius: 0.75rem;
+            margin-bottom: 0.75rem;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.85rem;
+            color: #666;
+            border: 1px solid var(--border);
+            line-height: 1.6;
         }
 
         .paywall-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 0, 0, 0.85);
-            border-radius: 1.5rem;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.95) 65%);
+            border-radius: 1.25rem;
             z-index: 10;
         }
 
         .unlock-btn {
-            background: #ffffff;
-            border: 2px solid #ffffff;
-            font-size: 1.25rem;
-            padding: 1.25rem 2.5rem;
+            background: var(--white);
+            color: #000;
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 1.1rem 2.5rem;
             border-radius: 999px;
             text-decoration: none;
             display: inline-block;
-            color: #000000;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            transition: transform 0.2s, box-shadow 0.3s;
+            letter-spacing: 0.02em;
         }
-        
         .unlock-btn:hover {
-            background: #000000;
-            color: #ffffff;
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(255,255,255,0.25);
+            color: #000;
         }
 
-        .loader {
-            display: none;
+        /* ── Footer ── */
+        footer {
+            width: 100%;
+            border-top: 1px solid var(--border);
+            padding: 1.5rem;
             text-align: center;
-            margin: 2rem 0;
+            font-size: 0.8rem;
+            color: #555;
+            letter-spacing: 0.02em;
         }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #333333;
-            border-top-color: #ffffff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .error-message {
-            display: none;
-            color: #ffffff;
-            background: #000000;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            border: 1px solid #ffffff;
-            margin-top: 1rem;
-            text-align: center;
-        }
+        footer span { color: #777; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>BoostMyYT</h1>
-            <p class="subtitle">Reverse-engineer viral scripts in seconds.</p>
-        </header>
+    <div class="page-wrapper">
+        <div class="container">
+            <header>
+                <h1>BoostMyYT</h1>
+                <p class="subtitle">Reverse-engineer viral scripts in seconds.</p>
+            </header>
 
-        <main>
-            <div class="glass-panel">
-                <form id="analyze-form" class="input-group">
-                    <input type="url" id="youtube-url" placeholder="Paste YouTube URL here (e.g. https://youtube.com/watch?v=...)" required>
-                    <button type="submit" id="submit-btn">Analyze Pipeline</button>
-                </form>
-                <div id="error-box" class="error-message"></div>
-            </div>
+            <main>
+                <div class="panel">
+                    <form id="analyze-form" class="input-group">
+                        <input type="url" id="youtube-url" placeholder="Paste a YouTube URL here..." required>
+                        <button type="submit" id="submit-btn" class="btn-primary">Analyze</button>
+                    </form>
 
-            <div id="loader" class="loader">
-                <div class="spinner"></div>
-                <p style="margin-top: 1rem; color: var(--text-muted);">Extracting transcript & analyzing...</p>
-            </div>
-
-            <div id="results" class="results">
-                <!-- Free Tier -->
-                <div class="glass-panel free-tier">
-                    <h2>📊 Free Analysis</h2>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="value" id="stat-hook">-</div>
-                            <div class="label">Hook Length</div>
+                    <!-- Progress Bar -->
+                    <div id="progress-section" class="progress-section">
+                        <div class="progress-bar-track">
+                            <div id="progress-bar" class="progress-bar-fill"></div>
                         </div>
-                        <div class="stat-card">
-                            <div class="value" id="stat-words">-</div>
-                            <div class="label">Word Count</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="value" id="stat-time">-</div>
-                            <div class="label">Est. Read Time</div>
+                        <div class="progress-label">
+                            <span id="progress-step">Connecting to server...</span>
+                            <span id="progress-percent">0%</span>
                         </div>
                     </div>
 
-                    <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: #ffffff;">Key Structural Points</h3>
-                    <ul class="points-list" id="main-points-list">
-                        <!-- Populated by JS -->
-                    </ul>
+                    <div id="error-box" class="error-message"></div>
                 </div>
 
-                <!-- Premium Tier -->
-                <div class="glass-panel premium-tier">
-                    <div class="blurred-content">
-                        <h2>💎 Premium Viral Template</h2>
-                        <p style="margin-bottom: 1rem; color: var(--text-muted);">Fill-in-the-blank script structure based on this video's success.</p>
-                        
-                        <div class="mock-script">
-                            [0:00 - 0:15] HOOK:<br>
-                            Open with a bold claim about [Topic] and agitate the viewer's pain point regarding [Pain Point].
+                <div id="results" class="results">
+                    <!-- Free Tier -->
+                    <div class="panel free-tier">
+                        <h2 class="section-title">Free Analysis</h2>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="value" id="stat-hook">—</div>
+                                <div class="label">Hook Length</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="value" id="stat-words">—</div>
+                                <div class="label">Word Count</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="value" id="stat-time">—</div>
+                                <div class="label">Read Time</div>
+                            </div>
                         </div>
-                        <div class="mock-script">
-                            [0:15 - 0:45] INTRO:<br>
-                            Introduce the solution: [Core Concept] and show a quick montage of proof.
-                        </div>
-                        <div class="mock-script">
-                            [0:45 - 2:00] BODY 1:<br>
-                            Step 1: Explain the biggest misconception about [Topic].
-                        </div>
+                        <h3 class="sub-title">Key Structural Points</h3>
+                        <ul class="points-list" id="main-points-list"></ul>
                     </div>
 
-                    <div class="paywall-overlay">
-                        <a href="https://rzp.io/rzp/7kXzogK" class="unlock-btn" target="_blank" rel="noopener noreferrer">
-                            Unlock Viral Script Template - ₹399
-                        </a>
-                        <p style="margin-top: 1rem; font-size: 0.875rem; color: #aaaaaa;">One-time payment for full structural breakdown</p>
+                    <!-- Premium Tier -->
+                    <div class="panel premium-tier">
+                        <div class="blurred-content">
+                            <h2 class="section-title">Premium Viral Template</h2>
+                            <p style="margin-bottom: 1rem; color: var(--text-muted); font-size: 0.9rem;">Fill-in-the-blank script structure modeled on this video.</p>
+                            <div class="mock-script">[0:00 – 0:15] HOOK — Open with a bold claim about [Topic] and agitate [Pain Point].</div>
+                            <div class="mock-script">[0:15 – 0:45] INTRO — Introduce the solution: [Core Concept]. Show proof.</div>
+                            <div class="mock-script">[0:45 – 2:00] BODY — Step 1: Explain the biggest misconception about [Topic].</div>
+                        </div>
+                        <div class="paywall-overlay">
+                            <a href="https://rzp.io/rzp/7kXzogK" class="unlock-btn" target="_blank" rel="noopener noreferrer">
+                                Unlock Viral Template — ₹399
+                            </a>
+                            <p style="margin-top: 0.75rem; font-size: 0.8rem; color: #555;">One-time payment · Instant access</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
+
+    <footer>
+        &copy; 2026 <span>BoostMyYT</span>. All rights reserved.
+    </footer>
 
     <script>
         const form = document.getElementById('analyze-form');
         const urlInput = document.getElementById('youtube-url');
         const submitBtn = document.getElementById('submit-btn');
-        const loader = document.getElementById('loader');
+        const progressSection = document.getElementById('progress-section');
+        const progressBar = document.getElementById('progress-bar');
+        const progressStep = document.getElementById('progress-step');
+        const progressPercent = document.getElementById('progress-percent');
         const results = document.getElementById('results');
         const errorBox = document.getElementById('error-box');
 
-        // Backend API URL.
         const API_URL = 'https://boostmyyt.onrender.com';
+
+        // Simulated progress stages
+        const stages = [
+            { pct: 15, text: 'Connecting to server...' },
+            { pct: 35, text: 'Extracting transcript...' },
+            { pct: 60, text: 'Analyzing video structure...' },
+            { pct: 80, text: 'Generating insights...' },
+        ];
+
+        function setProgress(pct, text) {
+            progressBar.style.width = pct + '%';
+            progressPercent.textContent = pct + '%';
+            if (text) progressStep.textContent = text;
+        }
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const url = urlInput.value.trim();
-            if(!url) return;
+            if (!url) return;
 
-            // Reset UI
+            // Reset
             errorBox.style.display = 'none';
             results.style.display = 'none';
-            loader.style.display = 'block';
             submitBtn.disabled = true;
             submitBtn.innerText = 'Analyzing...';
+
+            // Show progress
+            setProgress(0, stages[0].text);
+            progressSection.classList.add('active');
+
+            // Animate through stages
+            let stageIndex = 0;
+            const stageInterval = setInterval(() => {
+                if (stageIndex < stages.length) {
+                    setProgress(stages[stageIndex].pct, stages[stageIndex].text);
+                    stageIndex++;
+                }
+            }, 1500);
 
             try {
                 const response = await fetch(`${API_URL}/analyze`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ url: url })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
                 });
-
                 const data = await response.json();
 
+                clearInterval(stageInterval);
+
                 if (!response.ok) {
-                    throw new Error(data.detail || 'Failed to analyze video');
+                    throw new Error(data.detail || 'Failed to analyze video.');
                 }
 
-                // Populate Free Tier Data
-                document.getElementById('stat-hook').innerText = data.free_analysis.hook_length;
-                document.getElementById('stat-words').innerText = data.free_analysis.word_count.toLocaleString();
-                document.getElementById('stat-time').innerText = data.free_analysis.estimated_read_time;
+                // Complete progress
+                setProgress(100, 'Done!');
 
-                const pointsList = document.getElementById('main-points-list');
-                pointsList.innerHTML = '';
-                data.free_analysis.main_points.forEach(point => {
-                    const li = document.createElement('li');
-                    li.innerText = point;
-                    pointsList.appendChild(li);
-                });
+                setTimeout(() => {
+                    progressSection.classList.remove('active');
 
-                // Show results
-                loader.style.display = 'none';
-                results.style.display = 'flex';
-                
+                    // Populate
+                    document.getElementById('stat-hook').textContent = data.free_analysis.hook_length;
+                    document.getElementById('stat-words').textContent = data.free_analysis.word_count.toLocaleString();
+                    document.getElementById('stat-time').textContent = data.free_analysis.estimated_read_time;
+
+                    const list = document.getElementById('main-points-list');
+                    list.innerHTML = '';
+                    data.free_analysis.main_points.forEach(p => {
+                        const li = document.createElement('li');
+                        li.textContent = p;
+                        list.appendChild(li);
+                    });
+
+                    results.style.display = 'flex';
+                }, 600);
+
             } catch (err) {
-                loader.style.display = 'none';
-                errorBox.innerText = err.message;
+                clearInterval(stageInterval);
+                progressSection.classList.remove('active');
+                errorBox.textContent = err.message;
                 errorBox.style.display = 'block';
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerText = 'Analyze Pipeline';
+                submitBtn.innerText = 'Analyze';
             }
         });
     </script>
